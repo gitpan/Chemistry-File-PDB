@@ -1,4 +1,4 @@
-Chemistry/File/PDB version 0.22
+Chemistry/File/PDB version 0.23
 ===============================
 
 This module reads and writes PDB files. The PDB file format is commonly used to
@@ -17,7 +17,11 @@ information away.
 
 CHANGES SINCE VERSION 0.21
         - Add unique ID to atom names when generating from a $mol object.
-        - Add a TITLE and a REMARK on writing.
+        - Also treat END as a molecule separator in multi-molecule files.
+        - Fixed insertion code bug (thanks to kparkes).
+        - Fixed memory leak.
+        - Fixed a couple of atom symbol bugs.
+        - Add a title on output.
 
 INSTALLATION
 
@@ -37,7 +41,7 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENSE
 
-Copyright (C) 2004 Ivan Tubert
+Copyright (C) 2009 Ivan Tubert-Brohman
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

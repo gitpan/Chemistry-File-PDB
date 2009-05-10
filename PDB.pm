@@ -1,7 +1,7 @@
 package Chemistry::File::PDB;
 
-our $VERSION = '0.22';
-# $Id: PDB.pm,v 1.11 2005/05/16 22:33:48 itubert Exp $
+our $VERSION = '0.23';
+# $Id: PDB.pm,v 1.13 2009/05/10 21:57:32 itubert Exp $
 
 use base qw(Chemistry::File);
 use Chemistry::MacroMol;
@@ -141,9 +141,9 @@ sub read_mol {
 	if (/^TER/) {
             # TODO read separated molecules?
 	} elsif (/^(?:HETATM|ATOM)/) {
-	    my ($atom_n, $symbol, $suff, $res_name, $ins_code, $chain_id,
-                $seq_n, $x, $y, $z
-            ) = unpack "x6A5x1A2A2x1A3A1A1A4x4A8A8A8", $_;
+	    my ($atom_n, $symbol, $suff, $res_name, $chain_id,
+                $seq_n, $ins_code, $x, $y, $z
+            ) = unpack "x6A5x1A2A2x1A3x1A1A4A1x3A8A8A8", $_;
 	    #print "S:$symbol; N:$name; x:$x; y:$y; z:$z\n";
             $seq_n *= 1;
             if (!$domain || $seq_n != $curr_residue) {
@@ -160,9 +160,10 @@ sub read_mol {
                 }
                 $curr_residue = $seq_n;
             }
+            $symbol =~ s/ //g;
             my $atom_name = $symbol.$suff;
             $atom_name =~ s/ //g;
-            $symbol    =~ s/\d//g;
+            $symbol = ucfirst(lc($symbol));
 	    my $a = $domain->new_atom(
 		symbol => $symbol, 
 		coords => [$x, $y, $z], 
@@ -216,6 +217,7 @@ sub write_string {
 
             for my $atom ($res->atoms) {
                 my $serial_n  = $res->attr("pdb/serial_number");
+                my $ins_code  = $res->attr("pdb/insertion_code");
                 $serial_n     = $i++ unless defined $serial_n;
                 my @coords    = $atom->coords->array;
 
@@ -226,8 +228,8 @@ sub write_string {
                 $atom_name =~ /^(\dH|$symbol)(.{0,2})/;
                 #print "NAME: '$atom_name' ($1,$2); SYMBOL: '$symbol'\n";
                 $atom_name = sprintf "%2s%-2s", $1, $2;
-                $ret .= sprintf "ATOM  %5d %4s %-3s  %4d    %8.3f%8.3f%8.3f\n",
-                    $serial_n, $atom_name, $res_name, $seq_n, @coords;
+                $ret .= sprintf "ATOM  %5d %4s %-3s  %4d%1s   %8.3f%8.3f%8.3f\n",
+                    $serial_n, $atom_name, $res_name, $seq_n, $ins_code, @coords;
             }
         }
     } else {
@@ -255,7 +257,7 @@ sub write_string {
 
 =head1 VERSION
 
-0.22
+0.23
 
 =head1 SEE ALSO
 
@@ -274,9 +276,11 @@ Ivan Tubert-Brohman <itub@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2005 Ivan Tubert-Brohman. All rights reserved. This program is
+Copyright (c) 2009 Ivan Tubert-Brohman. All rights reserved. This program is
 free software; you can redistribute it and/or modify it under the same terms as
 Perl itself.
 
 =cut
 
+
+ 	  	 
