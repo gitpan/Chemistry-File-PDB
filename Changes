@@ -1,5 +1,9 @@
 Revision history for Perl extension Chemistry::File::PDB.
 
+0.22
+        - Add unique ID to atom names when generating from a $mol object.
+        - Also treat END as a molecule separator in multi-molecule files.
+
 0.21  Mon May 16 2005
         - Changed parse_file to read_mol
         - Read multi-model files (each model read as one molecule)
